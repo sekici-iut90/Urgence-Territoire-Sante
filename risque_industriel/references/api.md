@@ -4,7 +4,7 @@
 
 | Source | URL | Auth |
 |--------|-----|------|
-| Géorisques ICPE | `https://georisques.gouv.fr/api/v1/icpe` | Aucune |
+| Géorisques ICPE | `https://georisques.gouv.fr/api/v1/installations_classees` | Aucune |
 | BAN (géocodage) | `https://api-adresse.data.gouv.fr/search/` | Aucune |
 
 ---
@@ -21,9 +21,8 @@
 | `page_size` | int | Résultats par page (max : 100) |
 
 ### Exemple de requête
-
 ```
-GET https://georisques.gouv.fr/api/v1/icpe?latlon=48.8566,2.3522&rayon=3000&page=1&page_size=50
+GET https://georisques.gouv.fr/api/v1/installations_classees?latlon=2.3522,48.8566&rayon=3000&page=1&page_size=50
 ```
 
 ### Champs retournés (principaux)
@@ -33,11 +32,11 @@ GET https://georisques.gouv.fr/api/v1/icpe?latlon=48.8566,2.3522&rayon=3000&page
 | `raisonSociale` | Nom de l'établissement |
 | `statutSeveso` | `"Seveso seuil haut"`, `"Seveso seuil bas"`, ou null |
 | `regime` | Régime ICPE : Autorisation, Enregistrement, Déclaration |
-| `activitePrincipale` | Activité principale de l'installation |
+| `activite` | Activité principale de l'installation |
 | `adresse`, `commune`, `codePostal` | Localisation |
 | `latitude`, `longitude` | Coordonnées GPS de l'établissement |
 | `distance` | Distance en mètres depuis le point de recherche |
-| `codeS3ic` | Identifiant national de l'installation |
+| `code_icpe ` | Identifiant national de l'installation |
 
 ### Codes Seveso
 
@@ -52,7 +51,7 @@ GET https://georisques.gouv.fr/api/v1/icpe?latlon=48.8566,2.3522&rayon=3000&page
 ## Endpoint BAN — Géocodage d'adresse
 
 ```
-GET https://api-adresse.data.gouv.fr/search/?q=Place+de+la+République+Paris&limit=1
+GET https://api-adresse.data.gouv.fr/search/?q=Rouen&limit=1
 ```
 
 Retourne les coordonnées GPS de l'adresse.
