@@ -22,7 +22,7 @@ import urllib.error
 BAN_URL   = "https://api-adresse.data.gouv.fr/search/"
 ICPE_URL  = "https://georisques.gouv.fr/api/v1/installations_classees"
 RAYON_DEF = 3000  # mètres par défaut
-PAGE_SIZE = 50    # résultats max par page
+PAGE_SIZE = 100   # résultats max par page (100 est le maximum autorisé par l'API)
 
 SEVESO_LABELS = {
     "Seveso seuil haut": "🔴 SEVESO SEUIL HAUT",
@@ -63,24 +63,37 @@ def geocode_adresse(adresse: str) -> tuple[float, float, str]:
 
 
 def fetch_icpe(lat: float, lon: float, rayon: int) -> list[dict]:
-    """Interroge l'API Géorisques ICPE et retourne la liste brute des établissements."""
-    params = urllib.parse.urlencode({
-        "latlon":    f"{lon},{lat}",
-        "rayon":     rayon,
-        "page":      1,
-        "page_size": PAGE_SIZE,
-    })
-    url = f"{ICPE_URL}?{params}"
-    try:
-        req = urllib.request.Request(url, headers={"User-Agent": "UrGeo-Plugin/1.0"})
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            data = json.loads(resp.read())
-    except urllib.error.HTTPError as e:
-        raise SystemExit(json.dumps({"erreur": f"API Géorisques HTTP {e.code} : {e.reason}"}, ensure_ascii=False))
-    except Exception as e:
-        raise SystemExit(json.dumps({"erreur": f"API Géorisques inaccessible : {e}"}, ensure_ascii=False))
+    """Interroge l'API Géorisques ICPE et retourne la liste brute des établissements (avec pagination)."""
+    all_data = []
+    page = 1
+    max_pages = 5  # Sécurité contre les requêtes infinies
+    
+    while page <= max_pages:
+        params = urllib.parse.urlencode({
+            "latlon":    f"{lon},{lat}",
+            "rayon":     rayon,
+            "page":      page,
+            "page_size": PAGE_SIZE,
+        })
+        url = f"{ICPE_URL}?{params}"
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": "UrGeo-Plugin/1.0"})
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                data = json.loads(resp.read())
+        except urllib.error.HTTPError as e:
+            raise SystemExit(json.dumps({"erreur": f"API Géorisques HTTP {e.code} : {e.reason}"}, ensure_ascii=False))
+        except Exception as e:
+            raise SystemExit(json.dumps({"erreur": f"API Géorisques inaccessible : {e}"}, ensure_ascii=False))
 
-    return data.get("data", [])
+        batch = data.get("data", [])
+        if not batch:
+            break
+        all_data.extend(batch)
+        if len(batch) < PAGE_SIZE:
+            break
+        page += 1
+
+    return all_data
 
 
 def classer_seveso(statut: str | None) -> str:
@@ -183,7 +196,7 @@ def main():
     if args.seveso_only:
         etablissements_bruts = [
             e for e in etablissements_bruts
-            if e.get("statutSeveso") and "seveso" in e["statutSeveso"].lower()
+            if e.get("statutSeveso") and e["statutSeveso"].lower() in ["seveso seuil haut", "seveso seuil bas"]
         ]
 
     # ── Tri par distance calculée ───────────────────────────────────────────────
