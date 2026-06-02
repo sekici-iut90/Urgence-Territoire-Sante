@@ -72,7 +72,7 @@ GET https://api.open-meteo.com/v1/forecast
 |-------|----------------------------------|-----------------|
 | 0     | Ciel dégagé                      | Aucun           |
 | 1–3   | Partiellement nuageux            | Aucun           |
-| 45–48 | Brouillard givrant                | Vigilance       |
+| 45–48 | Brouillard givrant               | Vigilance       |
 | 51–67 | Bruine / Pluie                   | Faible          |
 | 71–77 | Neige / Grésil                   | Modéré          |
 | 80–82 | Averses fortes                   | Modéré          |
