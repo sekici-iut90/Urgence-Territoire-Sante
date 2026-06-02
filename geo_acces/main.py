@@ -14,6 +14,9 @@ import math
 import random
 import re
 import sys
+import urllib.error
+import urllib.parse
+import urllib.request
 from datetime import datetime, timezone
 from typing import NoReturn
 
@@ -135,8 +138,33 @@ def haversine(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     return 2 * R * math.asin(math.sqrt(a))
 
 
+def geocode_lieu(lieu: str) -> tuple[str, float, float] | tuple[None, None, None]:
+    """
+    Résout n'importe quel lieu (ville, village, hameau, adresse) en (nom, lat, lon)
+    via l'API Open-Meteo Geocoding (gratuite, sans clé, couvre toute la France).
+    Retourne (None, None, None) en cas d'échec réseau → mode dégradé activé.
+    """
+    params = urllib.parse.urlencode({
+        "name": lieu,
+        "count": 1,
+        "language": "fr",
+        "format": "json",
+    })
+    url = f"https://geocoding-api.open-meteo.com/v1/search?{params}"
+    try:
+        with urllib.request.urlopen(url, timeout=5) as response:
+            data = json.loads(response.read().decode("utf-8"))
+        results = data.get("results")
+        if results:
+            r = results[0]
+            return r["name"], float(r["latitude"]), float(r["longitude"])
+    except (urllib.error.URLError, urllib.error.HTTPError, json.JSONDecodeError):
+        pass  # Mode dégradé : fallback sur dictionnaire local
+    return None, None, None
+
+
 def resoudre_ville(texte: str) -> tuple[str, tuple[float, float]] | tuple[None, None]:
-    """Recherche la première ville connue dans une chaîne de texte."""
+    """Recherche la première ville connue localement (fallback hors-ligne)."""
     texte_norm = texte.lower()
     for ville, coords in COORDONNEES_VILLES.items():
         if ville in texte_norm:
@@ -147,18 +175,32 @@ def resoudre_ville(texte: str) -> tuple[str, tuple[float, float]] | tuple[None, 
 def calculer_distance(depart: str, arrivee: str) -> tuple[float, str | None, str | None]:
     """
     Calcule la distance routière estimée entre deux lieux.
-    - Si les deux villes sont reconnues → Haversine × 1.3 (facteur sinuosité routière).
-    - Sinon → distance intra-urbaine plausible (5–25 km) déterministe par requête.
+
+    Stratégie à 3 niveaux (résilience en situation de crise) :
+      1. API Open-Meteo Geocoding  → couvre tout village, hameau ou adresse de France
+      2. Dictionnaire local GPS    → fallback hors-ligne pour les grandes villes
+      3. Distance aléatoire déterministe → fallback absolu si aucun réseau ni correspondance
+
+    Applique le facteur de sinuosité routière ×1.3 (vol d'oiseau → distance route).
     Retourne (distance_km, nom_départ_résolu, nom_arrivée_résolu).
     """
-    nom_dep, coord_dep = resoudre_ville(depart)
-    nom_arr, coord_arr = resoudre_ville(arrivee)
+    # Niveau 1 — API de géocodage (n'importe quelle commune de France)
+    nom_dep_api, lat_dep, lon_dep = geocode_lieu(depart)
+    nom_arr_api, lat_arr, lon_arr = geocode_lieu(arrivee)
 
-    if coord_dep and coord_arr:
+    if lat_dep is not None and lat_arr is not None:
+        dist_vol = haversine(lat_dep, lon_dep, lat_arr, lon_arr)
+        return round(dist_vol * 1.3, 1), nom_dep_api, nom_arr_api
+
+    # Niveau 2 — Dictionnaire local (mode hors-ligne)
+    nom_dep_dict, coord_dep = resoudre_ville(depart)
+    nom_arr_dict, coord_arr = resoudre_ville(arrivee)
+
+    if coord_dep is not None and coord_arr is not None:
         dist_vol = haversine(*coord_dep, *coord_arr)
-        return round(dist_vol * 1.3, 1), nom_dep, nom_arr
+        return round(dist_vol * 1.3, 1), nom_dep_dict, nom_arr_dict
 
-    # Fallback déterministe (pas de coordonnées connues)
+    # Niveau 3 — Fallback absolu déterministe
     rng = random.Random(hash(depart.lower() + arrivee.lower()))
     return round(rng.uniform(5.0, 25.0), 1), None, None
 
