@@ -45,6 +45,18 @@ COORDONNEES_VILLES = {
     "brest":       (48.3904, -4.4861),
     "tours":       (47.3941,  0.6848),
     "clermont":    (45.7772,  3.0870),
+    "belfort":     (47.6384,  6.8628),
+    "saint-etienne": (45.4397,  4.3872),
+    "angers":      (47.4784, -0.5632),
+    "le mans":     (48.0061,  0.1996),
+    "perpignan":   (42.6986,  2.8956),
+    "limoges":     (45.8315,  1.2578),
+    "toulon":      (43.1242,  5.9280),
+    "besancon":    (47.2380,  6.0243),
+    "orleans":     (47.9030,  1.9093),
+    "poitiers":    (46.5802,  0.3404),
+    "troyes":      (48.2973,  4.0744),
+    "chartres":    (48.4469,  1.4885),
 }
 
 # ---------------------------------------------------------------------------
@@ -94,7 +106,7 @@ PROFILS_VEHICULES = {
     "moto":           {"gabarit": "Moto",  "hauteur_max_m": 1.5, "poids_max_t": 0.3,  "vitesse_ref_kmh": 70},
 }
 
-_ENTREE_RE = re.compile(r"^[\w\s\-\,\'\u00C0-\u024F\.\/]{1,200}$")
+_ENTREE_RE = re.compile(r"^[\w\s\-\,\'\u00C0-\u024F\.\/\?\!]{1,200}$")
 
 
 def erreur(message: str) -> NoReturn:
