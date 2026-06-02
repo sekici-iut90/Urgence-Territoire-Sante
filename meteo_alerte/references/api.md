@@ -66,19 +66,40 @@ GET https://api.open-meteo.com/v1/forecast
 
 ---
 
-## Codes météo WMO (weather_code) — Sélection des niveaux d'alerte
+## Codes météo WMO (weather_code) — Niveaux de vigilance Météo-France
 
-| Code  | Condition                        | Niveau d'alerte |
-|-------|----------------------------------|-----------------|
-| 0     | Ciel dégagé                      | Aucun           |
-| 1–3   | Partiellement nuageux            | Aucun           |
-| 45–48 | Brouillard givrant               | Vigilance       |
-| 51–67 | Bruine / Pluie                   | Faible          |
-| 71–77 | Neige / Grésil                   | Modéré          |
-| 80–82 | Averses fortes                   | Modéré          |
-| 85–86 | Averses de neige                 | Modéré          |
-| 95    | Orage                            | Élevé           |
-| 96–99 | Orage avec grêle                 | Critique        |
+> Les niveaux sont conformes au référentiel institutionnel Météo-France : **Vert / Jaune / Orange / Rouge**.
+
+| Code  | Condition                        | Vigilance Météo-France |
+|-------|----------------------------------|------------------------|
+| 0     | Ciel dégagé                      | Vert                   |
+| 1     | Principalement dégagé            | Vert                   |
+| 2     | Partiellement nuageux            | Vert                   |
+| 3     | Couvert                          | Vert                   |
+| 45    | Brouillard                       | Jaune                  |
+| 48    | Brouillard givrant               | Jaune                  |
+| 51    | Bruine légère                    | Vert                   |
+| 53    | Bruine modérée                   | Jaune                  |
+| 55    | Bruine dense                     | Jaune                  |
+| 56    | Bruine verglaçante               | Orange                 |
+| 57    | Bruine verglaçante forte         | Orange                 |
+| 61    | Pluie légère                     | Vert                   |
+| 63    | Pluie modérée                    | Jaune                  |
+| 65    | Pluie forte                      | Orange                 |
+| 66    | Pluie verglaçante                | Orange                 |
+| 67    | Pluie verglaçante forte          | Rouge                  |
+| 71    | Neige légère                     | Jaune                  |
+| 73    | Neige modérée                    | Orange                 |
+| 75    | Neige forte                      | Rouge                  |
+| 77    | Grésil                           | Orange                 |
+| 80    | Averses légères                  | Jaune                  |
+| 81    | Averses modérées                 | Orange                 |
+| 82    | Averses violentes                | Rouge                  |
+| 85    | Averses de neige                 | Orange                 |
+| 86    | Averses de neige fortes          | Rouge                  |
+| 95    | Orage                            | Orange                 |
+| 96    | Orage avec grêle                 | Rouge                  |
+| 99    | Orage violent avec grêle         | Rouge                  |
 
 ---
 
@@ -86,6 +107,7 @@ GET https://api.open-meteo.com/v1/forecast
 
 ```json
 {
+  "horodatage_utc": "2026-06-02T12:00:00+00:00",
   "ville": "Strasbourg",
   "latitude": 48.5734,
   "longitude": 7.7521,
@@ -94,14 +116,14 @@ GET https://api.open-meteo.com/v1/forecast
   "vent_kmh": 22.5,
   "weather_code": 95,
   "condition": "Orage",
-  "niveau_alerte": "Élevé"
+  "vigilance_meteofrance": "Orange"
 }
 ```
 
 **En cas d'erreur :**
 ```json
 {
-  "erreur": "Ville introuvable : 'XYZ'"
+  "erreur": "[Géocodage] Ville introuvable : 'XYZ'"
 }
 ```
 
@@ -109,5 +131,7 @@ GET https://api.open-meteo.com/v1/forecast
 
 ## Notes d'implémentation
 - **Aucune clé API requise** : Open-Meteo est entièrement gratuit.
-- **Modules Python utilisés** : `urllib.request`, `urllib.parse`, `json`, `argparse` (tous standards).
+- **Modules Python utilisés** : `urllib.request`, `urllib.parse`, `json`, `argparse`, `re`, `datetime` (tous standards).
 - **Pas de dépendances tierces** (`requests` non requis).
+- **Timeouts différenciés** : 5 s pour le géocodage, 10 s pour la prévision météo.
+- **Validation d'entrée** : le nom de ville est validé par regex avant tout appel réseau.

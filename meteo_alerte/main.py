@@ -7,60 +7,76 @@ Usage : python3 main.py --ville "Strasbourg"
 
 import argparse
 import json
+import re
 import sys
+import urllib.error
 import urllib.request
 import urllib.parse
+from datetime import datetime, timezone
+from typing import NoReturn
 
 # ---------------------------------------------------------------------------
-# Correspondance codes WMO → (condition lisible, niveau d'alerte)
+# Correspondance codes WMO → (condition lisible, niveau d'alerte Météo-France)
+# Référentiel : Vert / Jaune / Orange / Rouge (conforme Météo-France)
 # ---------------------------------------------------------------------------
 WMO_CODES = {
-    0:  ("Ciel dégagé",            "Aucun"),
-    1:  ("Principalement dégagé",  "Aucun"),
-    2:  ("Partiellement nuageux",  "Aucun"),
-    3:  ("Couvert",                "Aucun"),
-    45: ("Brouillard",             "Vigilance"),
-    48: ("Brouillard givrant",     "Vigilance"),
-    51: ("Bruine légère",          "Faible"),
-    53: ("Bruine modérée",         "Faible"),
-    55: ("Bruine dense",           "Faible"),
-    56: ("Bruine verglaçante",     "Modéré"),
-    57: ("Bruine verglaçante forte","Modéré"),
-    61: ("Pluie légère",           "Faible"),
-    63: ("Pluie modérée",          "Faible"),
-    65: ("Pluie forte",            "Modéré"),
-    66: ("Pluie verglaçante",      "Modéré"),
-    67: ("Pluie verglaçante forte","Élevé"),
-    71: ("Neige légère",           "Faible"),
-    73: ("Neige modérée",          "Modéré"),
-    75: ("Neige forte",            "Élevé"),
-    77: ("Grésil",                 "Modéré"),
-    80: ("Averses légères",        "Faible"),
-    81: ("Averses modérées",       "Modéré"),
-    82: ("Averses violentes",      "Élevé"),
-    85: ("Averses de neige",       "Modéré"),
-    86: ("Averses de neige fortes","Élevé"),
-    95: ("Orage",                  "Élevé"),
-    96: ("Orage avec grêle",       "Critique"),
-    99: ("Orage violent avec grêle","Critique"),
+    0:  ("Ciel dégagé",               "Vert"),
+    1:  ("Principalement dégagé",     "Vert"),
+    2:  ("Partiellement nuageux",     "Vert"),
+    3:  ("Couvert",                   "Vert"),
+    45: ("Brouillard",                "Jaune"),
+    48: ("Brouillard givrant",        "Jaune"),
+    51: ("Bruine légère",             "Vert"),
+    53: ("Bruine modérée",            "Jaune"),
+    55: ("Bruine dense",              "Jaune"),
+    56: ("Bruine verglaçante",        "Orange"),
+    57: ("Bruine verglaçante forte",  "Orange"),
+    61: ("Pluie légère",              "Vert"),
+    63: ("Pluie modérée",             "Jaune"),
+    65: ("Pluie forte",               "Orange"),
+    66: ("Pluie verglaçante",         "Orange"),
+    67: ("Pluie verglaçante forte",   "Rouge"),
+    71: ("Neige légère",              "Jaune"),
+    73: ("Neige modérée",             "Orange"),
+    75: ("Neige forte",               "Rouge"),
+    77: ("Grésil",                    "Orange"),
+    80: ("Averses légères",           "Jaune"),
+    81: ("Averses modérées",          "Orange"),
+    82: ("Averses violentes",         "Rouge"),
+    85: ("Averses de neige",          "Orange"),
+    86: ("Averses de neige fortes",   "Rouge"),
+    95: ("Orage",                     "Orange"),
+    96: ("Orage avec grêle",          "Rouge"),
+    99: ("Orage violent avec grêle",  "Rouge"),
 }
 
+# Regex d'acceptation des noms de villes (lettres latines étendues, tirets, apostrophes, espaces)
+_VILLE_RE = re.compile(r"^[\w\s\-\''\u00C0-\u024F]{1,100}$")
 
-def erreur(message: str) -> None:
+
+def erreur(message: str) -> NoReturn:
     """Affiche un JSON d'erreur et quitte avec le code 1."""
     print(json.dumps({"erreur": message}, ensure_ascii=False))
     sys.exit(1)
 
 
-def fetch_json(url: str) -> dict:
-    """Effectue un GET HTTP et retourne le JSON parsé."""
+def fetch_json(url: str, timeout: int = 10, context: str = "API") -> dict:
+    """Effectue un GET HTTP et retourne le JSON parsé.
+
+    Args:
+        url:     URL complète à appeler.
+        timeout: Délai maximum en secondes avant abandon.
+        context: Libellé de l'étape (ex: "Géocodage", "Météo") pour les messages d'erreur.
+    """
     try:
-        with urllib.request.urlopen(url, timeout=10) as response:
+        with urllib.request.urlopen(url, timeout=timeout) as response:
             return json.loads(response.read().decode("utf-8"))
+    except urllib.error.HTTPError as exc:
+        erreur(f"[{context}] Erreur HTTP {exc.code} : {exc.reason}")
     except urllib.error.URLError as exc:
-        erreur(f"Impossible de joindre l'API : {exc.reason}")
+        erreur(f"[{context}] Impossible de joindre l'API : {exc.reason}")
     except json.JSONDecodeError:
-        erreur("Réponse API invalide (JSON malformé).")
+        erreur(f"[{context}] Réponse API invalide (JSON malformé).")
 
 
 def geocode(ville: str) -> tuple[str, float, float]:
@@ -72,7 +88,7 @@ def geocode(ville: str) -> tuple[str, float, float]:
         "format": "json",
     })
     url = f"https://geocoding-api.open-meteo.com/v1/search?{params}"
-    data = fetch_json(url)
+    data = fetch_json(url, timeout=5, context="Géocodage")
 
     results = data.get("results")
     if not results:
@@ -91,7 +107,7 @@ def get_meteo(lat: float, lon: float) -> dict:
         "timezone": "auto",
     })
     url = f"https://api.open-meteo.com/v1/forecast?{params}"
-    data = fetch_json(url)
+    data = fetch_json(url, timeout=10, context="Météo")
 
     current = data.get("current")
     if not current:
@@ -101,7 +117,7 @@ def get_meteo(lat: float, lon: float) -> dict:
 
 
 def decode_wmo(code: int) -> tuple[str, str]:
-    """Retourne (condition, niveau_alerte) pour un code WMO."""
+    """Retourne (condition, niveau_alerte_meteofrance) pour un code WMO."""
     if code in WMO_CODES:
         return WMO_CODES[code]
     # Fallback : cherche la borne inférieure la plus proche
@@ -123,8 +139,12 @@ def main():
     args = parser.parse_args()
 
     ville_query = args.ville.strip()
+
+    # Validation de l'entrée : longueur et caractères autorisés
     if not ville_query:
         erreur("Le paramètre --ville ne peut pas être vide.")
+    if not _VILLE_RE.match(ville_query):
+        erreur("Nom de ville invalide (caractères non autorisés ou trop long).")
 
     # Étape 1 : Géocodage
     nom_ville, lat, lon = geocode(ville_query)
@@ -137,6 +157,7 @@ def main():
 
     # Étape 3 : Construction et affichage du JSON de sortie
     resultat = {
+        "horodatage_utc": datetime.now(timezone.utc).isoformat(),
         "ville": nom_ville,
         "latitude": lat,
         "longitude": lon,
@@ -145,7 +166,7 @@ def main():
         "vent_kmh": current.get("wind_speed_10m"),
         "weather_code": weather_code,
         "condition": condition,
-        "niveau_alerte": niveau_alerte,
+        "vigilance_meteofrance": niveau_alerte,
     }
 
     print(json.dumps(resultat, ensure_ascii=False, indent=2))
