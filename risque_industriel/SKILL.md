@@ -20,4 +20,4 @@ description: |
 
   Reformule les résultats en signalant les établissements à risque élevé en priorité
   et les périmètres d'exclusion recommandés.
-command: python3 ${CLAUDE_SKILL_DIR}/main.py --adresse "$ARGUMENTS"
+run: python3 ${CLAUDE_SKILL_DIR}/main.py --adresse "$ARGUMENTS"

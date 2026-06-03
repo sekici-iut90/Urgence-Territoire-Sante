@@ -1,11 +1,20 @@
-# Dépendances pour le plugin Urgence Territoire & Santé
-
-# Utilitaires HTTP 
-requests>=2.31.0
-
-# Domaine Population / INSEE 
-pynsee>=0.1.7
-
-# Domaine Géographie 
-shapely>=2.0.0
-pyproj>=3.6.0
+# ============================================================
+# Dépendances — Urgence Territoire & Santé
+# ============================================================
+#
+# ÉTAT ACTUEL : Tous les skills utilisent exclusivement la
+# bibliothèque standard Python (urllib, json, argparse, math…).
+# Aucune installation tierce n'est requise pour faire tourner
+# les scripts en production.
+#
+# DÉPENDANCES FUTURES (à décommenter si besoin) :
+#
+# population_vuln — si l'API INSEE nécessite un token OAuth2 :
+# requests>=2.31.0
+#
+# geo_acces / meteo_alerte — si migration vers une API avec
+# géocodage étendu (ex: Nominatim, OSRM) :
+# httpx>=0.27.0
+#
+# Scripts de test et développement uniquement :
+# pytest>=8.0.0

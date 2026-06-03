@@ -315,7 +315,8 @@ def main():
         }
 
     resultat = {
-        "mock": True,
+        "source_distance": "API Open-Meteo Geocoding (réel)" if nom_dep else "Dictionnaire local / estimation",
+        "alertes_source": "Simulation déterministe (non temps-réel)",
         "horodatage_utc": datetime.now(timezone.utc).isoformat(),
         "depart": depart_affiche,
         "arrivee": arrivee_affiche,

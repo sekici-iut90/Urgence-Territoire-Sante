@@ -178,9 +178,9 @@ def main():
 
     # ── Résolution des coordonnées ──────────────────────────────────────────────
     if args.adresse:
-        print(f"[Débug] Géocodage de l'adresse : {args.adresse}...", flush=True)
+        print(f"[Débug] Géocodage de l'adresse : {args.adresse}...", file=sys.stderr, flush=True)
         lat, lon, label_lieu = geocode_adresse(args.adresse)
-        print(f"[Débug] Coordonnées trouvées : Lat {lat}, Lon {lon}", flush=True)
+        print(f"[Débug] Coordonnées trouvées : Lat {lat}, Lon {lon}", file=sys.stderr, flush=True)
     else:
         if args.lon is None:
             parser.error("--lon est requis quand --lat est utilisé")
@@ -188,9 +188,9 @@ def main():
         label_lieu = f"{lat}, {lon}"
 
     # ── Appel API Géorisques ────────────────────────────────────────────────────
-    print(f"[Débug] Interrogation de Géorisques pour {label_lieu} (Rayon : {args.rayon}m)...", flush=True)
+    print(f"[Débug] Interrogation de Géorisques pour {label_lieu} (Rayon : {args.rayon}m)...", file=sys.stderr, flush=True)
     etablissements_bruts = fetch_icpe(lat, lon, args.rayon)
-    print(f"[Débug] API Géorisques a répondu ! Nombre de sites bruts : {len(etablissements_bruts)}", flush=True)
+    print(f"[Débug] API Géorisques a répondu ! Nombre de sites bruts : {len(etablissements_bruts)}", file=sys.stderr, flush=True)
 
     # ── Filtrage optionnel Seveso uniquement ────────────────────────────────────
     if args.seveso_only:
