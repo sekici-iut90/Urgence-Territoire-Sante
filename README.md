@@ -43,3 +43,15 @@ skill-name/
 ```
 
 > Ce design garantit une **empreinte idle quasi nulle** et une séparation nette entre le signal (SKILL.md) et la documentation (references/).
+
+## 🤖 Mode Multi-Agents 
+
+En plus des compétences CLI individuelles, ce plugin déploie une **cellule de crise multi-agents** locale via la commande native `/agents` de Claude Code. 
+
+- `coordonnateur` : Le dispatcher principal du COD qui reçoit l'alerte et orchestre la récolte de données.
+- `expert_population` / `expert_risques` / `expert_meteo` / `expert_geo` / `expert_health` : Des agents thématiques dotés de fiches d'instructions spécifiques et aux privilèges d'outils (`allowed-tools`) bridés à leur strict périmètre technique.
+
+Pour lancer une simulation complète de gestion de crise :
+```bash
+/agents coordonnateur
+> "Explosion signalée à Belfort avec début d'incendie, évaluez la situation globale."
