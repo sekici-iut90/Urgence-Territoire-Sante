@@ -10,7 +10,7 @@
 # DÉPENDANCES FUTURES (à décommenter si besoin) :
 #
 # population_vuln — si l'API INSEE nécessite un token OAuth2 :
-# requests>=2.31.0
+cdrequests>=2.31.0
 #
 # geo_acces / meteo_alerte — si migration vers une API avec
 # géocodage étendu (ex: Nominatim, OSRM) :

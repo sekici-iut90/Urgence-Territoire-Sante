@@ -10,8 +10,8 @@ description: |
   3. La sortie JSON est reformulée pour dimensionner les besoins d'évacuation ou de secours.
 
   QUESTIONS TYPE :
-  - "Combien de personnes âgées de plus de 65 ans vivent à Mulhouse ?"
-  - "Quelle est la population vulnérable à évacuer à Strasbourg ?"
+  - "Combien de personnes âgées de plus de 65 ans vivent à Montauban ?"
+  - "Quelle est la population vulnérable à évacuer à Rouen ?"
   - "Donne-moi les données INSEE sur la vulnérabilité de la commune de Belfort."
   - "Combien de logements surpeuplés y a-t-il à Lyon ?"
   - "Quel pourcentage de seniors vit seul à Bordeaux ?"
