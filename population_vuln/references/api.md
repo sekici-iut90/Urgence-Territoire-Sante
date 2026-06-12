@@ -15,7 +15,7 @@ L'outil retourne un objet JSON avec les clés suivantes :
 - `seniors_percentage` (Float) : Pourcentage de la population âgée de plus de 65 ans.
 - `overcrowding_percentage` (Float) : Pourcentage de logements en situation de suroccupation.
 
-## Codes d'erreur potentiels (pour l'intégration API future)
+## Codes d'erreur potentiels
 - `400 Bad Request` : Le code postal fourni est invalide ou mal formaté.
 - `404 Not Found` : Aucune donnée trouvée pour ce territoire.
 - `500 Internal Server Error` : Indisponibilité du service INSEE.
