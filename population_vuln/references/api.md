@@ -19,6 +19,3 @@ L'outil retourne un objet JSON avec les clés suivantes :
 - `400 Bad Request` : Le code postal fourni est invalide ou mal formaté.
 - `404 Not Found` : Aucune donnée trouvée pour ce territoire.
 - `500 Internal Server Error` : Indisponibilité du service INSEE.
-
-## Note d'implémentation
-Actuellement, le script `main.py` utilise des données simulées (mock). Lors de l'intégration réelle, il faudra rajouter la gestion du token Bearer pour s'authentifier auprès de l'API INSEE.
