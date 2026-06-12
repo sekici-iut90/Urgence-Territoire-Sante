@@ -1,0 +1,117 @@
+{
+  "timestamp": "2026-06-12T15:55:51.563074+00:00",
+  "facilities": [
+    {
+      "id": "osm_62981364",
+      "name": "EHPAD La Rosemontoise",
+      "type": "clinic",
+      "address": "1, Avenue Oscar Ehret, 90300, Valdoie",
+      "lat": 47.6744982,
+      "lon": 6.8440141,
+      "phone": null,
+      "website": "https://www.servir90.fr/ehpad/la-rosemontoise-a-valdoie/",
+      "source": "OpenStreetMap",
+      "capacity": {
+        "total_beds": null,
+        "available_beds": null,
+        "occupancy_rate": null
+      }
+    },
+    {
+      "id": "osm_79764470",
+      "name": "Clinique de la Miotte",
+      "type": "hospital",
+      "address": "1, Avenue de la Miotte",
+      "lat": 47.6431673,
+      "lon": 6.8635818,
+      "phone": null,
+      "website": null,
+      "source": "OpenStreetMap",
+      "capacity": {
+        "total_beds": null,
+        "available_beds": null,
+        "occupancy_rate": null
+      }
+    },
+    {
+      "id": "osm_183210029",
+      "name": "Hôpital Nord Franche-Comté",
+      "type": "hospital",
+      "address": "100, Route de Moval, 90400, Trévenans",
+      "lat": 47.5763149,
+      "lon": 6.8736241,
+      "phone": "+33 3 84 98 20 20",
+      "website": "https://www.hnfc.fr/",
+      "source": "OpenStreetMap",
+      "capacity": {
+        "total_beds": null,
+        "available_beds": null,
+        "occupancy_rate": null
+      }
+    },
+    {
+      "id": "osm_387890924",
+      "name": "Établissement de santé (hospital)",
+      "type": "hospital",
+      "address": "",
+      "lat": 47.6154837,
+      "lon": 6.8422308,
+      "phone": null,
+      "website": null,
+      "source": "OpenStreetMap",
+      "capacity": {
+        "total_beds": null,
+        "available_beds": null,
+        "occupancy_rate": null
+      }
+    },
+    {
+      "id": "osm_825405316",
+      "name": "Ehpad des Rubans",
+      "type": "clinic",
+      "address": "",
+      "lat": 47.661896,
+      "lon": 6.8455515,
+      "phone": null,
+      "website": null,
+      "source": "OpenStreetMap",
+      "capacity": {
+        "total_beds": null,
+        "available_beds": null,
+        "occupancy_rate": null
+      }
+    },
+    {
+      "id": "osm_1055042070",
+      "name": "Établissement de santé (hospital)",
+      "type": "hospital",
+      "address": "",
+      "lat": 47.6315497,
+      "lon": 6.8479987,
+      "phone": null,
+      "website": null,
+      "source": "OpenStreetMap",
+      "capacity": {
+        "total_beds": null,
+        "available_beds": null,
+        "occupancy_rate": null
+      }
+    },
+    {
+      "id": "osm_1154027587",
+      "name": "Centre kinésithérapeute",
+      "type": "hospital",
+      "address": "Échavanne",
+      "lat": 47.6576427,
+      "lon": 6.7326934,
+      "phone": null,
+      "website": null,
+      "source": "OpenStreetMap",
+      "capacity": {
+        "total_beds": null,
+        "available_beds": null,
+        "occupancy_rate": null
+      }
+    }
+  ]
+}
